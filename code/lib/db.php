@@ -77,19 +77,18 @@ function add_article($dbconn, $title, $content, $author) {
 }
 
 function update_article($dbconn, $title, $content, $aid) {
-	$query=
-		"UPDATE articles
+	$query= pg_prepare($dbconn, '', 'UPDATE articles
 		SET 
-		title='$title',
-		content='$content'
+		title=$1,
+		content=$2
 		WHERE
-		aid='$aid'";
-	return run_query($dbconn, $query);
+		aid=$3');
+	$query = pg_execute($dbconn, '', array($title, $content, $aid));
+	return $query;
 }
 
 function authenticate_user($dbconn, $username, $password) {
-	$query=
-		"SELECT
+	$query= pg_prepare($dbconn, '', 'SELECT
 		authors.id as id,
 		authors.username as username,
 		authors.password as password,
@@ -97,10 +96,11 @@ function authenticate_user($dbconn, $username, $password) {
 		FROM
 		authors
 		WHERE
-		username='".$_POST['username']."'
+		username=$1
 		AND
-		password='".$_POST['password']."'
-		LIMIT 1";
-	return run_query($dbconn, $query);
+		password=$2
+		LIMIT 1');
+	$query = pg_execute($dbconn, '', array($username, $password));
+	return $query;
 }	
 ?>
