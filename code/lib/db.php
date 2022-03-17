@@ -88,6 +88,18 @@ function update_article($dbconn, $title, $content, $aid) {
 }
 
 function authenticate_user($dbconn, $username, $password) {
+
+	$passwordQuery =  "SELECT
+		authors.password as password
+		FROM
+		authors
+		WHERE
+		username='".$_POST['username']."'
+		LIMIT 1";
+	
+	$storedPassword = run_query($dbconn, $passwordQuery);
+	$hash = pg_fetch_array($storedPassword);
+	
 	$query= pg_prepare($dbconn, '', 'SELECT
 		authors.id as id,
 		authors.username as username,
@@ -97,10 +109,13 @@ function authenticate_user($dbconn, $username, $password) {
 		authors
 		WHERE
 		username=$1
-		AND
-		password=$2
 		LIMIT 1');
-	$query = pg_execute($dbconn, '', array($username, $password));
-	return $query;
+	
+	if (password_verify($password, $hash[0])) {
+		$query = pg_execute($dbconn, '', array($username));
+		return $query;
+	} else {
+		header("Location: /login.php"); 
+	}
 }	
 ?>
