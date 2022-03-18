@@ -6,6 +6,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if (pg_num_rows($result) == 1) {
 		$_SESSION['username'] = $_POST['username'];
 		$_SESSION['authenticated'] = True;
+		
+		if($_SESSION['username'] === 'admin') {
+			$_SESSION['role'] === 'admin';
+		}
+		
+		event_logger($dbconn,"Successful login");
 		$_SESSION['id'] = pg_fetch_array($result)['id'];
 		//Redirect to admin area
 		header("Location: /admin.php");

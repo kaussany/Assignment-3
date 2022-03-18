@@ -6,18 +6,20 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
 	$aid = $_GET['aid'];	
 	
 	//if the current user's role is admin, access any article for edit
-	if ($_SESSION['role'] === 'admin'){
+	if ($_SESSION['username'] === 'admin'){
 	$result=get_article($dbconn, $aid);
 	$row = pg_fetch_array($result, 0);
+	event_logger($dbconn,"Article $aid edit attempt.");
 	}
 
 	//check if current user's role is not admin and if it is the author of the article. If yes, access article for edit
-	if ($_SESSION['role'] !== 'admin'){
+	if ($_SESSION['username'] !== 'admin'){
 		$result = get_article($dbconn, $aid);
 		$row = pg_fetch_array($result);
 	
 		if($_SESSION['username'] === $row['author']) {
-			$row = pg_fetch_array($result, 0);	
+			$row = pg_fetch_array($result, 0);
+			event_logger($dbconn,"Article $aid edit attempt.");	
 		} else {
 			header("Location: /admin.php");
 			exit();

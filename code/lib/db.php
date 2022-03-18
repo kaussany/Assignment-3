@@ -87,6 +87,24 @@ function update_article($dbconn, $title, $content, $aid) {
 	return $query;
 }
 
+function event_logger($dbconn,$event){
+	if (isset($_SESSION['username'])){
+		$username = $_SESSION['username'];
+	}else {
+		$username = 'GUEST';
+	}
+	
+	$query= "INSERT INTO
+	event_logs
+	(username, event)
+	VALUES
+	('$username','$event')";
+	
+	return run_query($dbconn, $query);
+	
+}
+
+
 function authenticate_user($dbconn, $username, $password) {
 
 	$passwordQuery =  "SELECT
@@ -118,4 +136,5 @@ function authenticate_user($dbconn, $username, $password) {
 		header("Location: /login.php"); 
 	}
 }	
+
 ?>
